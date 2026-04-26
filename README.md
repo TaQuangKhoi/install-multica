@@ -1,41 +1,42 @@
-# Multica Installer
+# Multica Desktop Installer
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/TaQuangKhoi/install-multica/main/install-multica.sh | bash
+curl -sSL https://raw.githubusercontent.com/TaQuangKhoi/install-multica-desktop/main/install-multica.sh | bash
 ```
 
-One-command installation script for [Multica](https://github.com/multica-ai/multica) — an AI-powered development platform for Linux.
+One-command installation script for the **Multica Desktop AppImage** — an AI-powered development platform for Linux.
+
+> ⚠️ This installs the **Desktop AppImage** only. For the CLI tool, see the [official install script](https://github.com/multica-ai/multica#installation).
 
 ## Features
 
-- Downloads the latest AppImage from GitHub releases
-- Installs to `~/.local/bin`
+- Downloads the latest Desktop AppImage from GitHub releases
+- Installs to `~/.local/bin/multica-desktop`
 - Creates desktop entry with icon
+- Auto-updates when new versions are available
 - Works on any Linux distro
 
 ## Requirements
 
 - `wget`
-- `update-desktop-database` (optional, for desktop integration)
+- `curl`
 
 ## Launch
 
-- Terminal: `multica`
-- App launcher: Search for "Multica"
+- Terminal: `multica-desktop`
+- App launcher: Search for "Multica Desktop"
+
+## Update
+
+```bash
+./install-multica.sh --update
+# or re-run the curl command
+```
 
 ## Uninstall
 
 ```bash
-rm ~/.local/bin/multica
+rm ~/.local/bin/multica-desktop
 rm ~/.local/share/applications/multica.desktop
-rm ~/.local/share/icons/multica.png
+rm ~/.local/share/icons/multica*.png
 ```
-
-## Details
-
-| Setting | Value |
-|---------|-------|
-| Version | 0.2.17 |
-| Binary | `~/.local/bin/multica` |
-| Desktop entry | `~/.local/share/applications/multica.desktop` |
-| Icon | `~/.local/share/icons/multica.png` |

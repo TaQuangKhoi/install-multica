@@ -7,7 +7,8 @@ INSTALL_DIR="$HOME/.local/bin"
 DESKTOP_FILE="$HOME/.local/share/applications/multica.desktop"
 ICON_DIR="$HOME/.local/share/icons"
 ICON_NAME="multica"
-EXEC_PATH="$INSTALL_DIR/multica"
+EXEC_NAME="multica-desktop"
+EXEC_PATH="$INSTALL_DIR/$EXEC_NAME"
 ICON_PATH="$ICON_DIR/multica.png"
 CURRENT_VERSION=""
 
@@ -120,12 +121,10 @@ do_install() {
     mkdir -p "$(dirname "$DESKTOP_FILE")"
     cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
-Name=Multica
+Name=Multica Desktop
 Comment=AI-powered development platform
 Exec=${EXEC_PATH}
 Icon=${ICON_PATH}
-Icon[en_US]=${ICON_NAME}
-SymbolicIcon=${ICON_NAME}
 Terminal=false
 Type=Application
 Categories=Development;IDE;AI;
