@@ -59,55 +59,45 @@ install_icon() {
     curl -sSL "https://raw.githubusercontent.com/multica-ai/multica/main/docs/assets/logo-dark.svg" -o "$DARK_SVG"
     
     # Convert SVG to PNG (512x512 for high-res icon)
-    if command -v convert &>/dev/null; then
-        convert -background none -size 512x512 "$LIGHT_SVG" "$LIGHT_PNG"
-        convert -background none -size 512x512 "$DARK_SVG" "$DARK_PNG"
-        # Fallback for apps that don't support adaptive icons
-        cp "$LIGHT_PNG" "$FALLBACK_PNG"
-        echo "  ✓ Converted SVG to PNG (ImageMagick)"
-    else
-        # Try rsvg-convert
+    if command -v magick &>/dev/null; then
+        # ImageMagick v7+
+        magick -background none -size 512x512 "$LIGHT_SVG" "$LIGHT_PNG" 2>/dev/null && \
+        magick -background none -size 512x512 "$DARK_SVG" "$DARK_PNG" 2>/dev/null && \
+        cp "$LIGHT_PNG" "$FALLBACK_PNG" && \
+        echo "  ✓ Converted SVG to PNG (ImageMagick)" && CONVERT_SUCCESS=1 || CONVERT_FAILED=1
+    fi
+    
+    if [[ -z "$CONVERT_FAILED" ]] && [[ ! -f "$LIGHT_PNG" ]]; then
         if command -v rsvg-convert &>/dev/null; then
             rsvg-convert -w 512 -h 512 "$LIGHT_SVG" -o "$LIGHT_PNG"
             rsvg-convert -w 512 -h 512 "$DARK_SVG" -o "$DARK_PNG"
             cp "$LIGHT_PNG" "$FALLBACK_PNG"
             echo "  ✓ Converted SVG to PNG (rsvg-convert)"
+        fi
+    fi
+    
+    if [[ ! -f "$LIGHT_PNG" ]]; then
+        echo -e "${YELLOW}  ⚠ SVG conversion failed. Using PNG from releases...${NC}"
+        # Fallback: download PNG from releases
+        local PNG_URL="https://github.com/${REPO}/releases/download/v${VERSION}/icon.png"
+        if curl -sSL "$PNG_URL" -o "$FALLBACK_PNG"; then
+            cp "$FALLBACK_PNG" "$LIGHT_PNG"
+            cp "$FALLBACK_PNG" "$DARK_PNG"
+            echo "  ✓ Downloaded PNG icon from releases"
         else
-            echo -e "${RED}  ⚠ No SVG converter found. Skipping icon.${NC}"
-            echo "  Install ImageMagick: sudo apt install imagemagick"
+            echo -e "${RED}  ⚠ Could not install icon.${NC}"
             return
         fi
     fi
     
-    # Set up adaptive icon symlinks in icon theme directories
-    local SIZES=(16 32 48 64 128 256 512)
-    local THEMES=("hicolor" "Adwaita")
-    
-    for THEME in "${THEMES[@]}"; do
-        for SIZE in "${SIZES[@]}"; do
-            local ICON_THEME_DIR="$ICON_DIR/${THEME}/${SIZE}x${SIZE}/apps"
-            mkdir -p "$ICON_THEME_DIR"
-            
-            # Create symbolic links for light/dark variants
-            ln -sf "../../../${ICON_NAME}-light.png" "$ICON_THEME_DIR/${ICON_NAME}.light" 2>/dev/null || true
-            ln -sf "../../../${ICON_NAME}-dark.png" "$ICON_THEME_DIR/${ICON_NAME}.dark" 2>/dev/null || true
-            
-            # Create scalable symlink for symbolic icon names
-            local SCALABLE_DIR="$ICON_DIR/${THEME}/scalable/apps"
-            mkdir -p "$SCALABLE_DIR"
-            ln -sf "../../../${ICON_NAME}-light.svg" "$SCALABLE_DIR/${ICON_NAME}.light" 2>/dev/null || true
-            ln -sf "../../../${ICON_NAME}-dark.svg" "$SCALABLE_DIR/${ICON_NAME}.dark" 2>/dev/null || true
-        done
-    done
+
     
     # Copy SVG files for scalable icons
-    cp "$LIGHT_SVG" "$ICON_DIR/${ICON_NAME}-light.svg"
-    cp "$DARK_SVG" "$ICON_DIR/${ICON_NAME}-dark.svg"
-    
-    # Update icon cache
-    gtk-update-icon-cache "$ICON_DIR/${THEME}" 2>/dev/null || true
+    cp "$LIGHT_SVG" "$ICON_DIR/${ICON_NAME}-light.svg" 2>/dev/null || true
+    cp "$DARK_SVG" "$ICON_DIR/${ICON_NAME}-dark.svg" 2>/dev/null || true
     
     rm -f "$LIGHT_SVG" "$DARK_SVG"
+    echo "  ✓ Icon installed"
     echo "  ✓ Adaptive icon installed"
 }
 
