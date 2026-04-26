@@ -71,22 +71,9 @@ install_icon() {
         fi
     fi
     
-    # Try ImageMagick if rsvg failed
-    if [[ $CONVERTED -eq 0 ]] && command -v magick &>/dev/null; then
-        # ImageMagick v7+ - check if SVG is allowed
-        if magick -help 2>&1 | grep -q "SVG"; then
-            if magick -background none -size 512x512 "$LIGHT_SVG" "$LIGHT_PNG" 2>/dev/null && \
-               magick -background none -size 512x512 "$DARK_SVG" "$DARK_PNG" 2>/dev/null; then
-                cp "$LIGHT_PNG" "$FALLBACK_PNG"
-                echo "  ✓ Converted SVG to PNG (ImageMagick)"
-                CONVERTED=1
-            fi
-        fi
-    fi
-    
     # Fallback: download PNG from releases
     if [[ $CONVERTED -eq 0 ]]; then
-        echo -e "${YELLOW}  ⚠ SVG conversion not available. Downloading PNG from releases...${NC}"
+        echo -e "${YELLOW}  📥 Downloading PNG icon from releases...${NC}"
         local PNG_URL="https://github.com/${REPO}/releases/download/v${VERSION}/icon.png"
         if curl -sSL "$PNG_URL" -o "$FALLBACK_PNG"; then
             cp "$FALLBACK_PNG" "$LIGHT_PNG"
