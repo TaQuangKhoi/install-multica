@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Multica
+Comment=AI-powered development platform
+Exec=/home/toikhoi/.local/bin/multica
+Icon=/home/toikhoi/.local/share/icons/multica.png
+Terminal=false
+Type=Application
+Categories=Development;IDE;AI;
+Keywords=multica;ai;coding;development;
+StartupWMClass=multica-desktop
